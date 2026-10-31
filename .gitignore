@@ -1,0 +1,27 @@
+# --- Android Gradle 项目标准忽略 ---
+.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# --- 签名与密钥（严禁提交） ---
+*.jks
+*.keystore
+*.jks.bak
+signing.properties
+
+# --- 构建产物 ---
+release/
+*.apk
+*.aab
+
+# --- 上游遗留杂项 ---
+handleRelease.bat
+adbConnect.bat
+build.sh
