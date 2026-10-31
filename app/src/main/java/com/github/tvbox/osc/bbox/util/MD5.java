@@ -148,6 +148,8 @@ public class MD5 {
             return strEncrypt.substring(0, strEncrypt.length() - 1); // 截断Base64产生的换行符
         } catch (UnsupportedEncodingException e) {
             Log.e("MD5", "加密模块暂不支持此字符集合" + e);
+        } catch (NoSuchAlgorithmException e) {
+            Log.e("MD5", "获取MD5信息摘要失败", e);
         }
         return null;
     }

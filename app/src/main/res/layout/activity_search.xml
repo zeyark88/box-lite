@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="horizontal">
+
+    <LinearLayout
+            android:layout_width="@dimen/vs_420"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/vs_20">
+
+        <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/vs_10"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+            <EditText
+                    android:id="@+id/etSearch"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/vs_50"
+                    android:background="@drawable/input_search"
+                    android:hint="请输入要搜索的内容"
+                    android:focusable="true"
+                    android:inputType="text"
+                    android:imeOptions="actionDone"
+                    android:maxLines="1"
+                    android:paddingLeft="@dimen/vs_10"
+                    android:paddingRight="@dimen/vs_10"
+                    android:textColor="@android:color/white"
+                    android:textColorHint="#99FFFFFF"
+                    android:textSize="@dimen/ts_20"/>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/vs_50"
+                    android:layout_marginTop="@dimen/vs_10"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:id="@+id/tvSearchCheckboxBtn"
+                        android:layout_width="0mm"
+                        android:layout_height="@dimen/vs_50"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_user_focus"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="指定站源"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/ts_20"/>
+                <Space
+                        android:layout_width="@dimen/vs_10"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:id="@+id/tvRemoteSearch"
+                        android:layout_width="0mm"
+                        android:layout_height="@dimen/vs_50"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_user_focus"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="远程搜索"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/ts_20"/>
+                <Space
+                        android:layout_width="@dimen/vs_10"
+                        android:layout_height="wrap_content"/>
+                <TextView
+                        android:id="@+id/tvClearSearchHistory"
+                        android:layout_width="0mm"
+                        android:layout_height="@dimen/vs_50"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_user_focus"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="清空历史"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/ts_20"/>
+            </LinearLayout>
+
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/vs_50"
+                    android:layout_marginTop="@dimen/vs_10"
+                    android:orientation="horizontal">
+
+                <TextView
+                        android:id="@+id/tvSearch"
+                        android:layout_width="0mm"
+                        android:layout_height="@dimen/vs_50"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_user_focus"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="搜  索"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/ts_20"/>
+
+                <Space
+                        android:layout_width="@dimen/vs_10"
+                        android:layout_height="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/tvClear"
+                        android:layout_width="0mm"
+                        android:layout_height="@dimen/vs_50"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_user_focus"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="清  空"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/ts_20"/>
+
+                <Space
+                        android:layout_width="@dimen/vs_10"
+                        android:layout_height="wrap_content"/>
+
+                <TextView
+                        android:id="@+id/tvBackSpace"
+                        android:layout_width="0mm"
+                        android:layout_height="@dimen/vs_50"
+                        android:layout_weight="1"
+                        android:background="@drawable/shape_user_focus"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:text="删  除"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/ts_20"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <com.github.tvbox.osc.bbox.ui.tv.widget.SearchKeyboard
+                android:id="@+id/keyBoardRoot"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+
+        <LinearLayout
+                android:id="@+id/remoteRoot"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+            <TextView
+                    android:id="@+id/tvAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/vs_20"
+                    android:gravity="center_horizontal"
+                    android:lineSpacingMultiplier="1.4"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ts_20"/>
+
+            <ImageView
+                    android:id="@+id/ivQRCode"
+                    android:layout_width="300mm"
+                    android:layout_height="300mm"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="20mm"
+                    tools:ignore="InOrMmUsage"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/llWord"
+            android:layout_width="@dimen/vs_200"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/vs_20"
+            android:paddingBottom="@dimen/vs_20">
+
+        <TextView
+                android:id="@+id/wordSwitch"
+                android:layout_width="@dimen/vs_200"
+                android:focusable="false"
+                android:gravity="center"
+                android:text="历史搜索"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/ts_20"
+                android:layout_marginBottom="@dimen/ts_10"
+                android:layout_height="@dimen/vs_48"/>
+
+        <com.owen.tvrecyclerview.widget.TvRecyclerView
+                android:id="@+id/mGridViewWord"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                app:tv_horizontalSpacingWithMargins="@dimen/vs_10"
+                app:tv_selectedItemIsCentered="true"
+                app:tv_verticalSpacingWithMargins="@dimen/vs_10"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+            android:id="@+id/llLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="visible"
+            android:padding="@dimen/vs_20">
+
+        <LinearLayout android:id="@+id/llHotWord"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:orientation="vertical"
+                      android:visibility="visible">
+            <TextView
+                    android:layout_width="match_parent"
+                    android:focusable="false"
+                    android:gravity="center_vertical"
+                    android:text="热门搜索"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/ts_20"
+                    android:layout_marginBottom="@dimen/ts_10"
+                    android:layout_height="@dimen/vs_48"/>
+
+
+            <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="top|center_horizontal"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:descendantFocusability="afterDescendants"
+                    android:scrollbars="none">
+                <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:descendantFocusability="afterDescendants">
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:focusable="false"
+                            android:gravity="center_vertical"
+                            android:text="热搜"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/ts_24"
+                            android:layout_marginTop="@dimen/ts_10"
+                            android:layout_height="@dimen/vs_50"/>
+
+                    <com.yang.flowlayoutlibrary.FlowLayout
+                            android:id="@+id/mGridViewHotWord"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:descendantFocusability="afterDescendants"
+                            android:clipChildren="false"
+                            android:clipToPadding="false"
+                            app:backgroundResource="@drawable/shape_user_focus"
+                            app:itemColor="@android:color/white"
+                            app:itemSize="@dimen/vs_20"
+                            app:textPaddingH="@dimen/vs_15"
+                            app:textPaddingV="@dimen/vs_10"
+                            app:horizontalSpacing="@dimen/vs_10"
+                            app:verticalSpacing="@dimen/vs_10"/>
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:focusable="false"
+                            android:gravity="center_vertical"
+                            android:text="电影"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/ts_24"
+                            android:layout_marginTop="@dimen/ts_10"
+                            android:layout_height="@dimen/vs_50"/>
+
+                    <com.yang.flowlayoutlibrary.FlowLayout
+                            android:id="@+id/mGridViewMovieHotWord"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clipChildren="false"
+                            android:clipToPadding="false"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:descendantFocusability="afterDescendants"
+                            app:backgroundResource="@drawable/shape_user_focus"
+                            app:itemColor="@android:color/white"
+                            app:itemSize="@dimen/vs_20"
+                            app:textPaddingH="@dimen/vs_15"
+                            app:textPaddingV="@dimen/vs_10"
+                            app:horizontalSpacing="@dimen/vs_10"
+                            app:verticalSpacing="@dimen/vs_10"/>
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:focusable="false"
+                            android:gravity="center_vertical"
+                            android:text="电视剧"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/ts_24"
+                            android:layout_marginTop="@dimen/ts_10"
+                            android:layout_height="@dimen/vs_50"/>
+
+                    <com.yang.flowlayoutlibrary.FlowLayout
+                            android:id="@+id/mGridViewTvHotWord"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clipChildren="false"
+                            android:clipToPadding="false"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:descendantFocusability="afterDescendants"
+                            app:backgroundResource="@drawable/shape_user_focus"
+                            app:itemColor="@android:color/white"
+                            app:itemSize="@dimen/vs_20"
+                            app:textPaddingH="@dimen/vs_15"
+                            app:textPaddingV="@dimen/vs_10"
+                            app:horizontalSpacing="@dimen/vs_10"
+                            app:verticalSpacing="@dimen/vs_10"/>
+
+                    <TextView
+                            android:layout_width="match_parent"
+                            android:focusable="false"
+                            android:gravity="center_vertical"
+                            android:text="动漫"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/ts_24"
+                            android:layout_marginTop="@dimen/ts_10"
+                            android:layout_height="@dimen/vs_50"/>
+
+                    <com.yang.flowlayoutlibrary.FlowLayout
+                            android:id="@+id/mGridViewCiliHotWord"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:clipChildren="false"
+                            android:clipToPadding="false"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:descendantFocusability="afterDescendants"
+                            app:backgroundResource="@drawable/shape_user_focus"
+                            app:itemColor="@android:color/white"
+                            app:itemSize="@dimen/vs_20"
+                            app:textPaddingH="@dimen/vs_15"
+                            app:textPaddingV="@dimen/vs_10"
+                            app:horizontalSpacing="@dimen/vs_10"
+                            app:verticalSpacing="@dimen/vs_10"/>
+                </LinearLayout>
+            </ScrollView>
+        </LinearLayout>
+
+        <com.owen.tvrecyclerview.widget.TvRecyclerView
+                android:id="@+id/mGridView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:visibility="gone"
+                app:tv_horizontalSpacingWithMargins="@dimen/vs_5"
+                app:tv_selectedItemIsCentered="true"
+                app:tv_verticalSpacingWithMargins="@dimen/vs_5"/>
+    </LinearLayout>
+</LinearLayout>

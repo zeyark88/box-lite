@@ -1,6 +1,13 @@
 # Changelog
 
-本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
+本项目为 `mlabamed/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
+
+## [1.0.0] — 2026-10-31 首个可构建发行版
+- **构建成功**：`assembleDebug` / `assembleRelease` 全通过；产物 `release/box-v1.0.0.apk`（约 20MB，v1+v2 双签名，1 签名者）。
+- 补齐完整源码（`res`、`AndroidManifest`、`player`、`quickjs`、gradle 包装、`app/libs`）。
+- 修复 2 处影响编译的构建问题：`FlowLayout` 依赖 groupId 笔误、根 `build.gradle` 死仓库。
+- 签名改为从 `local.properties` 读取（keystore 在 `~/box-keys/`，**勿入库**）。
+- 内含 P0 bug 修复 + P1 m3u8 原生核心（默认关闭），见 `docs/`。
 
 ## [Unreleased] — 初始骨架
 - 清理 `app/build.gradle`：移除明文 key 与密码、改为 `local.properties` 读取。
