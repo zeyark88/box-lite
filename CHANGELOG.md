@@ -2,6 +2,11 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.8] — 2026-10-31 修复图标(续)
+- **修复老设备(<安卓8) legacy 图标显示异常**：此前 legacy 渐变误用亮粉色，已统一为与自适应一致的**蓝紫渐变**+白盒播放键，圆角透明。
+- 产物 `release/box-v1.0.8.apk`（18MB，versionCode 9）。
+- 提示：Android 启动器会缓存旧图标，装新版前请先卸载旧包。
+
 ## [1.0.7] — 2026-10-31 修复图标黑块（自适应图标）
 - **修复部分设备图标显示异常（黑块）**：改用**标准自适应图标**。
 - 新增透明前景（白盒+播放三角）+ 蓝紫渐变背景 + `mipmap-anydpi-v26/ic_launcher.xml`，并补全 legacy `mipmap-*/ic_launcher.png`；manifest `android:icon/@roundIcon` 指向 `@mipmap/ic_launcher`。
