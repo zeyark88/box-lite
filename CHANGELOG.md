@@ -2,6 +2,10 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.6] — 2026-10-31 精简（去除冗余依赖）
+- 移除 `com.google.net.cronet:cronet-okhttp` + `org.chromium.net:cronet-embedded`（代码 0 引用）→ **APK 20MB→18MB**，原生库 libcronet 消失。
+- 复核 `juniversalchardet`（CharsetUtils/SubtitleLoader 在用）→ 保留；`brotli`（自研 urlhttp 栈在用）→ 保留。
+
 ## [1.0.5] — 2026-10-31 更换默认壁纸
 - 按截图样式生成新的默认壁纸 `drawable/app_bg.png`：**左下暖橙黄 → 右上翠青/浅蓝的柔和对角线性渐变**（1440×958，轻磨砂雾感）。
 - 已确认打进 APK（`BaseActivity` 默认 `R.drawable.app_bg`）。
