@@ -2,6 +2,11 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.13] — 2026-10-31 关于页加 GitHub 地址
+- "关于"对话框加入本发行版 GitHub：`https://github.com/zeyark88/box-lite`（保留上游出处）。
+- 已核验地址在 APK 编译布局内。
+- 产物 `release/box-v1.0.13.apk`（18MB，versionCode 14）。
+
 ## [1.0.12] — 2026-10-31 清理图标资源·核对源码
 - 核对：manifest 图标 = `@mipmap/ic_launcher`（全密度不透明蓝紫渐变位图，alpha 全=255），无运行时改图标代码。
 - 清理残留：删除旧白色 `app_icon`、废弃 `ic_launcher_background/foreground`；保留 `drawable/app_icon.png`（播放页用到）为蓝紫图标。
