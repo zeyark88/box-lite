@@ -1,6 +1,10 @@
 # Changelog
 
-本项目为 `mlabamed/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
+本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
+
+## [1.0.1] — 2026-10-31 启动闪退修复
+- **修复启动闪退**：原生库（p2p/quickjs/ijk/player 等）仅预编译 `armeabi-v7a`，此前误把 release `abiFilters` 放开为三 ABI，导致 arm64/x86 设备缺 so、启动即崩。已还原为仅 `armeabi-v7a`（arm64 设备以 32 位兼容运行）。
+- 产物 `release/box-v1.0.1.apk`（15.2MB，versionCode 2，仅 `lib/armeabi-v7a`）。
 
 ## [1.0.0] — 2026-10-31 首个可构建发行版
 - **构建成功**：`assembleDebug` / `assembleRelease` 全通过；产物 `release/box-v1.0.0.apk`（约 20MB，v1+v2 双签名，1 签名者）。
