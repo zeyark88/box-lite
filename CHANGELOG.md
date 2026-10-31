@@ -8,6 +8,11 @@
 - 删除 Windows 专属 `DEBUG_APP`（硬编码 adb 路径）任务。
 - 新增 `docs/`：`ANALYSIS.md`、`ROADMAP.md`、`DISTRIBUTION.md`；规范化 `README.md`、`CHANGELOG.md`、`.gitignore`。
 
+### Added（P1 原生化，见 `docs/ROADMAP.md`）
+- `app/src/main/jni/m3u8_core.c`：纯 C 复刻 `M3u8` 去广告过滤核心，已 `cc` 编译 + 样例自测通过。
+- `app/src/main/jni/jni_m3u8.c` + `CMakeLists.txt` + `util/M3u8Native.java`：JNI 桥接。
+- `M3u8.purify()` 接入原生路径（默认关闭 `useNative()`，待真机回归后放开）。
+
 ### Fixed（P0 bug 修复，见 `docs/ANALYSIS.md`）
 - fix(H2): `MD5.java` 改为每次新建 `MessageDigest`，消除共享实例的线程安全问题。
 - fix(H3): `AES.java` 先判空再 `trim()`，避免 null key NPE。

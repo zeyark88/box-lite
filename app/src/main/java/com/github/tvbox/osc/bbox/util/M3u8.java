@@ -39,7 +39,17 @@ public class M3u8 {
         currentAdCount = 0;
         if (null == m3u8content || m3u8content.length() == 0) return null;
         if (!m3u8content.startsWith("#EXTM3U")) return null;
-        String result = removeMinorityUrl(tsUrlPre, m3u8content);
+        String result = null;
+        // P1：优先尝试原生(C)过滤（默认未启用，回归通过后由 M3u8Native.useNative() 放开）
+        if (M3u8Native.useNative()) {
+            int[] adCount = new int[1];
+            String n = M3u8Native.removeMinority(tsUrlPre, m3u8content, adCount);
+            if (n != null && adCount[0] > 0) {
+                currentAdCount = adCount[0];
+                return n;
+            }
+        }
+        result = removeMinorityUrl(tsUrlPre, m3u8content);
         if (result != null && currentAdCount>0) return result;
         result = get(tsUrlPre, m3u8content);
         long cost = System.currentTimeMillis() - start;

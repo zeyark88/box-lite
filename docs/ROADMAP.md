@@ -11,10 +11,18 @@
 | 阶段 | 内容 | 验收标准 | 可回滚 |
 |------|------|----------|--------|
 | P0 | 修复 H1-H3、M1-M5、L1-L3 全部 bug | 单测/手工验证通过，无 NPE、无串数据 | 单项回滚 |
-| P1 | `M3u8` 去广告过滤 → JNI/C++ | 播放广告拦截耗时显著下降、内存下降 | 是 |
+| P1 | `M3u8` 去广告过滤 → JNI/C | 播放广告拦截耗时显著下降、内存下降 | 是 |
 | P2 | `JsonParallel`/`SuperParse` 解析 → JNI/C++ | 解析并发更稳、更快 | 是 |
 | P3 | `RSA/AES/MD5` 改用 NDK 内置加密（BoringSSL） | 解密提速、消除线程安全风险 | 是 |
 | P4 | 削依赖：去 `util/urlhttp` 自研栈统一 `okhttp`；按需裁剪 `cronet`/`brotli` | dex/包体积减小、老内存稳定 | 是 |
+
+## P1 进展（已落地部分）
+- 原生核心 `app/src/main/jni/m3u8_core.c`：忠实移植 Java `removeMinorityUrl`/`maxPercent`，
+  纯 C 无依赖，已在宿主机用 `cc` 编译并通过样例单测（广告段被移除、多数占比<0.8 回退）。
+- JNI 桥接 `app/src/main/jni/jni_m3u8.c` + `CMakeLists.txt` + Java 入口 `util/M3u8Native.java`。
+- `M3u8.purify()` 已接原生路径，但 **默认关闭**（`M3u8Native.useNative()` 返回 false），
+  需真机回归（对比 Java 去广告结果一致）后再放开，避免影响播放。
+- 待办：完整源码补全后接入 NDK 构建、跑全量回归、再放开 `useNative()`。
 
 ## P0 修复清单（改前先备份，逐条改、逐条编译）
 
