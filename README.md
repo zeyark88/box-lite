@@ -18,10 +18,19 @@
 
 ## 构建
 ```bash
-# 需 JDK8 + Android SDK；NDK 用于 native 模块
+# 需 JDK8 + Android SDK（本机已配好 portable 工具链：dist-tools/）
+# 签名 keystore 放 ~/box-keys/box-release.jks，密码在 dist-tools/keystore-password.txt（勿入库）
+export JAVA_HOME=$PWD/dist-tools/jdk
+export PATH="$JAVA_HOME/bin:$PWD/dist-tools/gradle-6.7.1/bin:$PATH"
+export ANDROID_HOME=$HOME/Android/Sdk
 ./gradlew assembleRelease
-# 产物：release/box-<version>.apk（需先按 DISTRIBUTION.md 配好签名）
+# 产物：release/box-v<版本>.apk
 ```
+
+### 已发布产物 v1.0.0
+- `release/box-v1.0.0.apk`（~20MB，v1+v2 双签名，`com.eu.box.daily`，minSdk16/targetSdk26）
+- SHA256：`ea595688272ed05de76c104caa1f81fa5484f93410d83612ad77a091b464ac99`
+- keystore：`~/box-keys/box-release.jks`（**务必备份，丢失无法再发版**）
 
 ## 版权与协议
 - 本发行版：AGPL-3.0
