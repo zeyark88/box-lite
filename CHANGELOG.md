@@ -2,6 +2,11 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.5] — 2026-10-31 更换默认壁纸
+- 按截图样式生成新的默认壁纸 `drawable/app_bg.png`：**左下暖橙黄 → 右上翠青/浅蓝的柔和对角线性渐变**（1440×958，轻磨砂雾感）。
+- 已确认打进 APK（`BaseActivity` 默认 `R.drawable.app_bg`）。
+- 产物 `release/box-v1.0.5.apk`（20MB，versionCode 6）。
+
 ## [1.0.4] — 2026-10-31 深层 bug 加固
 - **`server/InputRequestProcess`**：远程推流/遥控 POST 参数缺失时 `.trim()` 会 NPE，已统一防空（恶意/残缺请求不再崩本地服务）。
 - **字幕解析加固**：`subtitle/model/Time.java` 时间解析加 try-catch（畸形字幕不再 `NumberFormatException`/越界崩溃）；`Style.getRGBValue` 数值颜色分支加 try-catch（畸形色值返回 null 而非崩溃）。
