@@ -9,8 +9,8 @@ android {
         applicationId 'tv.of.eu.box.daily'
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 2
-        versionName '1.0.1'
+        versionCode 3
+        versionName '1.0.2'
         multiDexEnabled true
         javaCompileOptions {
             annotationProcessorOptions {
@@ -55,10 +55,12 @@ android {
         }
         release {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            minifyEnabled true
+            // 关闭 R8 混淆/裁剪：proguard-rules.pro 为空，R8 会删掉 Room/Gson/quickjs 等反射用类，
+            // 造成 release 启动即崩（debug 正常）。为保证可运行，release 暂不开启 minify。
+            minifyEnabled false
             // 仅当本地配置了签名时才签名，否则输出未签名包（不可直接安装）
             signingConfig signingConfigs.release
-            // 原生库(p2p/quickjs/ijker/player)仅预编译了 armeabi-v7a，必须限定该 ABI，
+            // 原生库(p2p/quickjs/ijk/player)仅预编译了 armeabi-v7a，必须限定该 ABI，
             // 否则 arm64/x86 设备缺 .so 启动即崩（arm64 会以 32 位兼容运行 armeabi-v7a）
             ndk { abiFilters 'armeabi-v7a' }
         }

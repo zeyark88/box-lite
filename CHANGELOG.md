@@ -2,6 +2,11 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.2] — 2026-10-31 启动闪退（续）：关闭 R8 混淆
+- `app/proguard-rules.pro` 为空，但 release 此前 `minifyEnabled true`，R8 会删掉 Room/Gson/quickjs 等反射用类 → release 启动即崩（debug 正常）。
+- **release 关闭 `minify`（`minifyEnabled false`）**，消除 R8 误删风险。
+- 产物 `release/box-v1.0.2.apk`（19.6MB，versionCode 3，minSdk16 / armeabi-v7a）。
+
 ## [1.0.1] — 2026-10-31 启动闪退修复
 - **修复启动闪退**：原生库（p2p/quickjs/ijk/player 等）仅预编译 `armeabi-v7a`，此前误把 release `abiFilters` 放开为三 ABI，导致 arm64/x86 设备缺 so、启动即崩。已还原为仅 `armeabi-v7a`（arm64 设备以 32 位兼容运行）。
 - 产物 `release/box-v1.0.1.apk`（15.2MB，versionCode 2，仅 `lib/armeabi-v7a`）。
