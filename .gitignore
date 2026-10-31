@@ -35,3 +35,5 @@ dist-tools/*.log
 handleRelease.bat
 adbConnect.bat
 build.sh
+# CI 工作流待 token 带 workflow 作用域后再提交
+.github/workflows/GEN.yml
