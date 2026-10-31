@@ -149,7 +149,7 @@ public class M3u8 {
                     if (end != -1) {
                         keyUrl = lines[i].substring(start, end);
                     }
-                    if (!keyUrl.startsWith("http://") && !keyUrl.startsWith("https://")) {
+                    if (!keyUrl.startsWith("http://") && !keyUrl.startsWith("https://") && keyUrl.length() > 0) {
                         String newKeyUrl;
                         if (keyUrl.charAt(0) == '/') {
                             int ifirst = tsUrlPre.indexOf('/', 9); //skip https://, http://

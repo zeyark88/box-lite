@@ -23,41 +23,41 @@ public class SuperParse {
 
     public static JSONObject parse(LinkedHashMap<String, HashMap<String, String>> jx, String flag, String url) {
         try {
-            // 初始化全局配置（configs）一次
-            if (configs == null) {
-                configs = new HashMap<>();
-                for (Map.Entry<String, HashMap<String, String>> entry : jx.entrySet()) {
-                    String key = entry.getKey();
-                    HashMap<String, String> parseBean = entry.getValue();
-                    if (parseBean == null) {
-                        continue;
-                    }
-                    String type = parseBean.get("type");
-                    if (type == null) {
-                        continue;
-                    }
-                    if ("1".equals(type) || "0".equals(type)) {
-                        try {
-                            String ext = parseBean.get("ext");
-                            if (ext == null) {
-                                continue;
-                            }
-                            JSONArray flagsArray = new JSONObject(ext).getJSONArray("flag");
-                            for (int j = 0; j < flagsArray.length(); j++) {
-                                String flagKey = flagsArray.getString(j);
-                                ArrayList<String> flagJx = configs.get(flagKey);
-                                if (flagJx == null) {
-                                    flagJx = new ArrayList<>();
-                                    configs.put(flagKey, flagJx);
-                                }
-                                flagJx.add(key);
-                            }
-                        } catch (Exception e) {
-                            SpiderDebug.log(e);
+            // 每次按当前 jx 重建 configs（原实现仅在首次构建，切换源后配置不会更新）
+            configs = new HashMap<>();
+            for (Map.Entry<String, HashMap<String, String>> entry : jx.entrySet()) {
+                String key = entry.getKey();
+                HashMap<String, String> parseBean = entry.getValue();
+                if (parseBean == null) {
+                    continue;
+                }
+                String type = parseBean.get("type");
+                if (type == null) {
+                    continue;
+                }
+                if ("1".equals(type) || "0".equals(type)) {
+                    try {
+                        String ext = parseBean.get("ext");
+                        if (ext == null) {
+                            continue;
                         }
+                        JSONArray flagsArray = new JSONObject(ext).getJSONArray("flag");
+                        for (int j = 0; j < flagsArray.length(); j++) {
+                            String flagKey = flagsArray.getString(j);
+                            ArrayList<String> flagJx = configs.get(flagKey);
+                            if (flagJx == null) {
+                                flagJx = new ArrayList<>();
+                                configs.put(flagKey, flagJx);
+                            }
+                            flagJx.add(key);
+                        }
+                    } catch (Exception e) {
+                        SpiderDebug.log(e);
                     }
                 }
             }
+            // 注：configs/jsonJx/webJx 仍为类级 static，多线程并发解析会互相覆盖（jsonJx 竞态）。
+            //     彻底修复需把 jsonJx 作为参数贯穿调用链（涉及外部调用方），安排在源码补全后的重构阶段。
 
             // 根据配置构建 jsonJx 和 webJx
             jsonJx = new LinkedHashMap<>();

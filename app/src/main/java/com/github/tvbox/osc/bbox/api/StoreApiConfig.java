@@ -127,6 +127,8 @@ public class StoreApiConfig {
                             });
                         }
                     }
+                    // 多仓历史上限，防止无限制增长
+                    while (storeNameHistory.size() > 30) storeNameHistory.remove(storeNameHistory.size() - 1);
                     Toast.makeText(context, "多仓订阅结束，到多源历史中切换！！！", Toast.LENGTH_SHORT).show();
                 } else {
                     // 单源链接，直接请求
@@ -151,16 +153,18 @@ public class StoreApiConfig {
 
     private String MutiUrl(String urlsJson) {
 
-        // ArrayList<String> history = Hawk.get(HawkConfig.API_NAME_HISTORY, new ArrayList<>());
-        // HashMap<String, String> map = Hawk.get(HawkConfig.API_MAP, new HashMap<>());
-
+        // 合并既有持久化的历史，避免每次订阅都覆盖已有线路（原实现用全新局部变量导致历史被清空）
         ArrayList<String> history = new ArrayList<>();
         HashMap<String, String> map = new HashMap<>();
+        ArrayList<String> savedHistory = Hawk.get(HawkConfig.API_NAME_HISTORY, new ArrayList<>());
+        HashMap<String, String> savedMap = Hawk.get(HawkConfig.API_MAP, new HashMap<>());
+        if (savedHistory != null) history.addAll(savedHistory);
+        if (savedMap != null) map.putAll(savedMap);
 
         String apiName = Hawk.get(HawkConfig.API_NAME, "");
         String apiUrl = Hawk.get(HawkConfig.API_URL, "");
 
-        if (!apiName.isEmpty()) {
+        if (!apiName.isEmpty() && !history.contains(apiName)) {
             history.add(apiName);
             map.put(apiName, apiUrl);
         }
@@ -181,8 +185,8 @@ public class StoreApiConfig {
                 map.put(name, url);
             }
         }
-//        Hawk.put(HawkConfig.API_NAME, history.get(0));
-//        Hawk.put(HawkConfig.API_URL, map.get(history.get(0)));
+        // 限制历史上限，防止无限制增长
+        while (history.size() > 30) history.remove(history.size() - 1);
         Hawk.put(HawkConfig.API_NAME_HISTORY, history);
         Hawk.put(HawkConfig.API_MAP, map);
         return "订阅结束，共 " + history.size() + " 条线路";
