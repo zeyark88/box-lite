@@ -2,6 +2,11 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.7] — 2026-10-31 修复图标黑块（自适应图标）
+- **修复部分设备图标显示异常（黑块）**：改用**标准自适应图标**。
+- 新增透明前景（白盒+播放三角）+ 蓝紫渐变背景 + `mipmap-anydpi-v26/ic_launcher.xml`，并补全 legacy `mipmap-*/ic_launcher.png`；manifest `android:icon/@roundIcon` 指向 `@mipmap/ic_launcher`。
+- 产物 `release/box-v1.0.7.apk`（18MB，versionCode 8）。
+
 ## [1.0.6] — 2026-10-31 精简（去除冗余依赖）
 - 移除 `com.google.net.cronet:cronet-okhttp` + `org.chromium.net:cronet-embedded`（代码 0 引用）→ **APK 20MB→18MB**，原生库 libcronet 消失。
 - 复核 `juniversalchardet`（CharsetUtils/SubtitleLoader 在用）→ 保留；`brotli`（自研 urlhttp 栈在用）→ 保留。
