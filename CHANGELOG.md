@@ -2,6 +2,12 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.3] — 2026-10-31 定制化（禁用更新 + 改名 + 换图标）
+- **禁用自动更新并删除更新地址**：`URL.GITHUB_VERSION_PATH` 置空；`App.initXUpdate()` 停用；设置"检查更新"改为提示"已禁用自动更新"（不再联网）。
+- **改名**：`app_name` 由 `Jade` → `星辰盒`。
+- **换图标**：用生成的新图标替换 `app_icon`（drawable 及 hdpi/xhdpi/xxhdpi/xxxhdpi 全密度）。
+- 产物 `release/box-v1.0.3.apk`（19MB，versionCode 4，minSdk16，`应用名=星辰盒`）。
+
 ## [1.0.2] — 2026-10-31 启动闪退（续）：关闭 R8 混淆
 - `app/proguard-rules.pro` 为空，但 release 此前 `minifyEnabled true`，R8 会删掉 Room/Gson/quickjs 等反射用类 → release 启动即崩（debug 正常）。
 - **release 关闭 `minify`（`minifyEnabled false`）**，消除 R8 误删风险。

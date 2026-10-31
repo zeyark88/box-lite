@@ -65,7 +65,7 @@ public class App extends MultiDexApplication {
         PlayerHelper.init();
         QuickJSLoader.init();
         FileUtils.cleanPlayerCache();
-        initXUpdate();
+        // initXUpdate(); // 发行版禁用自动更新模块
 
         // davTest();
     }

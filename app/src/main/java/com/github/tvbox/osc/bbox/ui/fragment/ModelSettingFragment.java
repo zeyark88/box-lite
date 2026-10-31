@@ -124,11 +124,11 @@ public class ModelSettingFragment extends BaseLazyFragment {
         tvIjkCachePlay.setText(Hawk.get(HawkConfig.IJK_CACHE_PLAY, false) ? "开启" : "关闭");
         tvHomeDefaultShow = findViewById(R.id.tvHomeText);
         tvHomeDefaultShow.setText(Hawk.get(HawkConfig.DEFAULT_LOAD_LIVE, false) ? "直播" : "点播");
-        checkHasUpdate();
+        // checkHasUpdate(); // 发行版禁用自动更新
         findViewById(R.id.llCheckUpdate).setOnClickListener( v -> {
-            Toast.makeText(mActivity, "检查更新中...", Toast.LENGTH_SHORT).show();
-            checkUpdate();
-            notificationPoint.setVisibility(View.GONE);
+            // 发行版禁用更新：点击仅提示
+            Toast.makeText(mActivity, "已禁用自动更新", Toast.LENGTH_SHORT).show();
+            if (notificationPoint != null) notificationPoint.setVisibility(View.GONE);
         });
         findViewById(R.id.llDebug).setOnClickListener(new View.OnClickListener() {
             @Override
