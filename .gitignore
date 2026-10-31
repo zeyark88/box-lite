@@ -21,6 +21,14 @@ release/
 *.apk
 *.aab
 
+# --- dist-tools（工具链，不入库） ---
+dist-tools/jdk/
+dist-tools/gradle-6.7.1/
+dist-tools/src-src/
+dist-tools/*.tar.gz
+dist-tools/*.zip
+dist-tools/*.log
+
 # --- 上游遗留杂项 ---
 handleRelease.bat
 adbConnect.bat
