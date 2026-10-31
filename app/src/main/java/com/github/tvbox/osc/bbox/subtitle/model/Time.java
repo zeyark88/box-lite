@@ -36,6 +36,7 @@ public class Time {
 	 * @param value  string in the correct format
 	 */
 	public Time(String format, String value) {
+		try {
 		if (format.equalsIgnoreCase("hh:mm:ss,ms")){
 			// this type of format:  01:02:22,501 (used in .SRT)
 			int h, m, s, ms;
@@ -68,6 +69,7 @@ public class Time {
 
 			mseconds = (int)(f*1000/fps) + s*1000 + m*60000 + h*3600000;
 		}
+		} catch (Exception e) { mseconds = 0; } // 畸形时间不崩溃
 	}
 
 	// in an integer we can store 24 days worth of milliseconds, no need for a long

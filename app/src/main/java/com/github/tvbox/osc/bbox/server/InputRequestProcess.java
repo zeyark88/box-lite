@@ -33,37 +33,37 @@ public class InputRequestProcess implements RequestProcess {
         DataReceiver mDataReceiver = remoteServer.getDataReceiver();
         switch (fileName) {
             case "/action":
-                if (params.get("do") != null && mDataReceiver != null) {
+                // 参数可能缺失(null)，统一防空，避免远程恶意/残缺请求触发 NPE
+                if (mDataReceiver != null) {
                     String action = params.get("do");
-
                     switch (action) {
                         case "search": {
-                            mDataReceiver.onTextReceived(params.get("word").trim());
+                            mDataReceiver.onTextReceived(nz(params, "word"));
                             break;
                         }
                         case "api": {
-                            mDataReceiver.onApiReceived(params.get("url").trim());
+                            mDataReceiver.onApiReceived(nz(params, "url"));
                             break;
                         }
                         case "store": {
-                            mDataReceiver.onStoreReceived(params.get("url").trim());
+                            mDataReceiver.onStoreReceived(nz(params, "url"));
                             break;
                         }
                         case "live": {
-                            mDataReceiver.onLiveReceived(params.get("url").trim());
+                            mDataReceiver.onLiveReceived(nz(params, "url"));
                             break;
                         }
                         case "epg": {
-                            mDataReceiver.onEpgReceived(params.get("url").trim());
+                            mDataReceiver.onEpgReceived(nz(params, "url"));
                             break;
                         }
                         case "proxy": {
-                            mDataReceiver.onProxyReceived(params.get("url").trim());
+                            mDataReceiver.onProxyReceived(nz(params, "url"));
                             break;
                         }
                         case "push": {
                             // 暂未实现
-                            mDataReceiver.onPushReceived(params.get("url").trim());
+                            mDataReceiver.onPushReceived(nz(params, "url"));
                             break;
                         }
                     }
@@ -72,5 +72,11 @@ public class InputRequestProcess implements RequestProcess {
             default:
                 return RemoteServer.createPlainTextResponse(NanoHTTPD.Response.Status.NOT_FOUND, "Error 404, file not found.");
         }
+    }
+
+    /** 取参数并 trim，缺失时返回空串（防 NPE）。 */
+    private static String nz(Map<String, String> params, String key) {
+        String v = params.get(key);
+        return v == null ? "" : v.trim();
     }
 }

@@ -2,6 +2,12 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.4] — 2026-10-31 深层 bug 加固
+- **`server/InputRequestProcess`**：远程推流/遥控 POST 参数缺失时 `.trim()` 会 NPE，已统一防空（恶意/残缺请求不再崩本地服务）。
+- **字幕解析加固**：`subtitle/model/Time.java` 时间解析加 try-catch（畸形字幕不再 `NumberFormatException`/越界崩溃）；`Style.getRGBValue` 数值颜色分支加 try-catch（畸形色值返回 null 而非崩溃）。
+- 复核确认无崩点：`JsonParallel` 的 `cat_ext` 解析已在 try 内；`StringUtils` 的 trim/substring 有长度边界保护。
+- 备注（低危）：`LivePlayActivity` 的 `static SimpleDateFormat` 仅 UI 线程使用，暂不改动。
+
 ## [1.0.3] — 2026-10-31 定制化（禁用更新 + 改名 + 换图标）
 - **禁用自动更新并删除更新地址**：`URL.GITHUB_VERSION_PATH` 置空；`App.initXUpdate()` 停用；设置"检查更新"改为提示"已禁用自动更新"（不再联网）。
 - **改名**：`app_name` 由 `Jade` → `星辰盒`。

@@ -146,23 +146,23 @@ public class Style {
 			sb.append(value.substring(2, 3));
 			color = sb.toString();
 		} else if (format.equalsIgnoreCase("decimalCodedBBGGRR")) {
-			// normal format from SSA
-			color = Integer.toHexString(Integer.parseInt(value));
-			// any missing 0s are filled in
-			while (color.length() < 6)
-				color = "0" + color;
-			// order is reversed
-			color = color.substring(4) + color.substring(2, 4)
-					+ color.substring(0, 2) + "ff";
+			// normal format from SSA；畸形值不抛异常
+			try {
+				color = Integer.toHexString(Integer.parseInt(value));
+				while (color.length() < 6)
+					color = "0" + color;
+				color = color.substring(4) + color.substring(2, 4)
+						+ color.substring(0, 2) + "ff";
+			} catch (Exception e) { color = null; }
 		} else if (format.equalsIgnoreCase("decimalCodedAABBGGRR")) {
-			// normal format from ASS
-			color = Long.toHexString(Long.parseLong(value));
-			// any missing 0s are filled in
-			while (color.length() < 8)
-				color = "0" + color;
-			// order is reversed
-			color = color.substring(6) + color.substring(4, 6)
-					+ color.substring(2, 4) + color.substring(0, 2);
+			// normal format from ASS；畸形值不抛异常
+			try {
+				color = Long.toHexString(Long.parseLong(value));
+				while (color.length() < 8)
+					color = "0" + color;
+				color = color.substring(6) + color.substring(4, 6)
+						+ color.substring(2, 4) + color.substring(0, 2);
+			} catch (Exception e) { color = null; }
 		}
 		return color;
 	}
