@@ -28,8 +28,9 @@ export ANDROID_HOME=$HOME/Android/Sdk
 ```
 
 ### 已发布产物
-- 最新：`release/box-v1.0.14.apk`（`tv.of.eu.box.daily`，versionCode 15，minSdk16/targetSdk26，仅 `armeabi-v7a`）
-- 历史各版本产物与修复明细见 [`CHANGELOG.md`](CHANGELOG.md)；发布校验值随每次发版在 CHANGELOG 中更新
+- **最新 [v1.0.14](https://github.com/zeyark88/box-lite/releases/tag/v1.0.14)**：`box-v1.0.14.apk`（`tv.of.eu.box.daily`，versionCode 15，minSdk16/targetSdk26，仅 `armeabi-v7a`），发布说明与 SHA256 校验值见 [Releases](https://github.com/zeyark88/box-lite/releases)
+- ⚠️ v1.0.14 起启用新正式签名（原密钥遗失），无法覆盖升级 1.0.13 及更早版本，需卸载后全新安装（详见该版 Release 说明）
+- 历史各版本修复明细见 [`CHANGELOG.md`](CHANGELOG.md)
 - keystore：`~/box-keys/box-release.jks`（**务必备份，丢失无法再发版**；路径与密码勿入库）
 
 ## 版权与协议
