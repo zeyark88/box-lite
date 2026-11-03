@@ -27,10 +27,10 @@ export ANDROID_HOME=$HOME/Android/Sdk
 # 产物：release/box-v<版本>.apk
 ```
 
-### 已发布产物 v1.0.0
-- `release/box-v1.0.0.apk`（~20MB，v1+v2 双签名，`com.eu.box.daily`，minSdk16/targetSdk26）
-- SHA256：`ea595688272ed05de76c104caa1f81fa5484f93410d83612ad77a091b464ac99`
-- keystore：`~/box-keys/box-release.jks`（**务必备份，丢失无法再发版**）
+### 已发布产物
+- 最新：`release/box-v1.0.14.apk`（`tv.of.eu.box.daily`，versionCode 15，minSdk16/targetSdk26，仅 `armeabi-v7a`）
+- 历史各版本产物与修复明细见 [`CHANGELOG.md`](CHANGELOG.md)；发布校验值随每次发版在 CHANGELOG 中更新
+- keystore：`~/box-keys/box-release.jks`（**务必备份，丢失无法再发版**；路径与密码勿入库）
 
 ## 版权与协议
 - 本发行版：AGPL-3.0

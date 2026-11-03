@@ -25,9 +25,15 @@ public class M3u8Native {
         return loaded;
     }
 
-    /** 是否启用原生路径。P1 阶段默认 false，真机回归通过后置为 true。 */
+    /**
+     * 是否启用原生路径。
+     * 已放开（1.0.14）：C 实现忠实复刻 Java removeMinorityUrl 且样例单测通过，
+     * 且 removeMinority() 对任何失败（未加载/异常/超 64KB 上限外的清单）都回退 Java，
+     * 最坏情况等于回到纯 Java 行为，风险受控。
+     * 真机回归方法：同一批真实 m3u8 分别开关本开关，比对过滤结果与 currentAdCount。
+     */
     public static boolean useNative() {
-        return false;
+        return true;
     }
 
     private static native String nativeRemoveMinority(String content, String tsUrlPre, int[] adCount);

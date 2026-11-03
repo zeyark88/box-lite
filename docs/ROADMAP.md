@@ -16,13 +16,28 @@
 | P3 | `RSA/AES/MD5` 改用 NDK 内置加密（BoringSSL） | 解密提速、消除线程安全风险 | 是 |
 | P4 | 削依赖：去 `util/urlhttp` 自研栈统一 `okhttp`；按需裁剪 `cronet`/`brotli` | dex/包体积减小、老内存稳定 | 是 |
 
-## P1 进展（已落地部分）
+## P1 进展（1.0.14 已全链路打通）
 - 原生核心 `app/src/main/jni/m3u8_core.c`：忠实移植 Java `removeMinorityUrl`/`maxPercent`，
   纯 C 无依赖，已在宿主机用 `cc` 编译并通过样例单测（广告段被移除、多数占比<0.8 回退）。
 - JNI 桥接 `app/src/main/jni/jni_m3u8.c` + `CMakeLists.txt` + Java 入口 `util/M3u8Native.java`。
-- `M3u8.purify()` 已接原生路径，但 **默认关闭**（`M3u8Native.useNative()` 返回 false），
-  需真机回归（对比 Java 去广告结果一致）后再放开，避免影响播放。
-- 待办：完整源码补全后接入 NDK 构建、跑全量回归、再放开 `useNative()`。
+- **1.0.14 打通三处断点**（此前原生路径从未真正生效）：
+  1. `M3u8.purify()` 调用 `M3u8Native.removeMinority` 参数顺序颠倒（content/tsUrlPre 对调）——已修复；
+  2. `app/build.gradle` 未接 `externalNativeBuild`，`libm3u8native.so` 从未编译进 APK——已接入
+     （新增构建前置：NDK + CMake，如 `sdkmanager "ndk;21.4.7075529" "cmake;3.10.2"`）；
+  3. `CMakeLists.txt` 的 `set(ANDROID_ABI ...)` 是无效死代码——已移除（ABI 由 Gradle 控制）。
+- `jni_m3u8.c` 输出缓冲由 64KB 固定栈改为按需 malloc（上界=原文长+行数×(前缀+2)+4KB），大清单不再回退。
+- `M3u8Native.useNative()` 已放开（true）：任何失败路径（未加载/异常/无法处理）自动回退 Java，
+  最坏情况等于回到纯 Java 行为。
+- 待办（真机回归后关闭）：同一批真实 m3u8 分别开关 useNative，比对过滤结果与 currentAdCount 一致；
+  回归通过后此条可删除。
+
+## 1.0.14 顺带落地（P2 前置的 Java 层热路径优化）
+- `JsonParallel`：OkHttpClient/线程池改共享常驻单例（原每次 parse 新建，连接与线程零复用）；
+  futures/calls 局部化消除并发竞态；take() 无限等待改 15s 整体超时；按 Call 精确取消本批；
+  Response 显式 close；修复 `cat_ext` 为末位参数时的 substring 越界。
+- `SuperParse`：`doJsonJx(url)` 的 jsonJx null NPE 修复 + 快照拷贝；`flagWebJx` 改 `ConcurrentHashMap`。
+  （jsonJx 静态竞态的彻底修复仍留给 P2 重构：需把 jsonJx 作为参数贯穿调用链。）
+- `StoreApiConfig`：订阅返回非 JSON 时崩溃兜底；线路名不在 storeMap 时 null URL 回退默认仓库。
 
 ## P0 修复清单（改前先备份，逐条改、逐条编译）
 

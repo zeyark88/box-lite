@@ -73,6 +73,8 @@ public class StoreApiConfig {
         */
 
         String storeUrl = storeMap.isEmpty() ? URL.DEFAULT_STORE_API_URL:storeMap.get(Hawk.get(HawkConfig.STORE_API_NAME, ""));
+        // 1.0.14：map 非空但当前线路名不在 map 中时 get() 返回 null，原实现把 null 直接传给 OkGo
+        if (storeUrl == null || storeUrl.isEmpty()) storeUrl = URL.DEFAULT_STORE_API_URL;
 
         LOG.i("订阅仓库地址：" + storeUrl);
 
@@ -80,68 +82,79 @@ public class StoreApiConfig {
         StoreApiConfig.get().doGet(storeUrl, new StoreApiConfigCallback() {
             @Override
             public void success(String sourceJson) {
-                JsonObject json = new Gson().fromJson(sourceJson, JsonObject.class);
-                if (null == json.get("urls")) {
-                    // 仓库链接，先获取多源，再获取多配置
-                    JsonObject infoJson = new Gson().fromJson(sourceJson, JsonObject.class);
-                    JsonArray storeHouses = infoJson.get("storeHouse").getAsJsonArray();
-                    JsonObject defStoreHouse = storeHouses.get(0).getAsJsonObject();
+                // 1.0.14：订阅地址可能返回非 JSON（网关错误页/空内容），原实现直接 Gson 解析，
+                // 异常抛在 OkGo 回调线程会导致应用崩溃。整体兜底：异常只提示、不入库。
+                try {
+                    JsonObject json = new Gson().fromJson(sourceJson, JsonObject.class);
+                    if (json == null) {
+                        Toast.makeText(context, "订阅数据格式异常！", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (null == json.get("urls")) {
+                        // 仓库链接，先获取多源，再获取多配置
+                        JsonObject infoJson = new Gson().fromJson(sourceJson, JsonObject.class);
+                        JsonArray storeHouses = infoJson.get("storeHouse").getAsJsonArray();
+                        JsonObject defStoreHouse = storeHouses.get(0).getAsJsonObject();
 
-                    // 多仓线路作为历史添加
-                    // 默认添加30条，多出的直接放弃
-                    for (int i = 0; i < storeHouses.size(); i++) {
+                        // 多仓线路作为历史添加
+                        // 默认添加30条，多出的直接放弃
+                        for (int i = 0; i < storeHouses.size(); i++) {
 
-                        JsonObject storeHouse = infoJson.get("storeHouse").getAsJsonArray().get(i).getAsJsonObject();
+                            JsonObject storeHouse = infoJson.get("storeHouse").getAsJsonArray().get(i).getAsJsonObject();
 
-                        String sourceName = storeHouse.get("sourceName").getAsString();
-                        String sourceUrl = storeHouse.get("sourceUrl").getAsString();
+                            String sourceName = storeHouse.get("sourceName").getAsString();
+                            String sourceUrl = storeHouse.get("sourceUrl").getAsString();
 
-                        if (!storeMap.containsValue(sourceUrl)) {
-                            storeMap.put(sourceName, sourceUrl);
-                            storeNameHistory.add(sourceName);
+                            if (!storeMap.containsValue(sourceUrl)) {
+                                storeMap.put(sourceName, sourceUrl);
+                                storeNameHistory.add(sourceName);
+                            }
+                            // if (history.size() > 30)
+                            //     // history.remove(30);
+                            //     break;
+                            if (0 == i) {
+
+                                String name = defStoreHouse.get("sourceName").getAsString();
+                                String url = defStoreHouse.get("sourceUrl").getAsString();
+                                Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
+
+                                Hawk.put(HawkConfig.STORE_API, url);
+                                Hawk.put(HawkConfig.STORE_API_NAME, name);
+
+                                // 配置默认配置线路
+                                StoreApiConfig.get().doGet(url, new StoreApiConfigCallback() {
+                                    @Override
+                                    public void success(String urlsJson) {
+                                        String result = MutiUrl(urlsJson);
+                                        Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void error(String msg) {
+                                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
                         }
-                        // if (history.size() > 30)
-                        //     // history.remove(30);
-                        //     break;
-                        if (0 == i) {
-
-                            String name = defStoreHouse.get("sourceName").getAsString();
-                            String url = defStoreHouse.get("sourceUrl").getAsString();
-                            Toast.makeText(context, name, Toast.LENGTH_SHORT).show();
-
-                            Hawk.put(HawkConfig.STORE_API, url);
-                            Hawk.put(HawkConfig.STORE_API_NAME, name);
-
-                            // 配置默认配置线路
-                            StoreApiConfig.get().doGet(url, new StoreApiConfigCallback() {
-                                @Override
-                                public void success(String urlsJson) {
-                                    String result = MutiUrl(urlsJson);
-                                    Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
-                                }
-
-                                @Override
-                                public void error(String msg) {
-                                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
-                                }
-                            });
+                        // 多仓历史上限，防止无限制增长
+                        while (storeNameHistory.size() > 30) storeNameHistory.remove(storeNameHistory.size() - 1);
+                        Toast.makeText(context, "多仓订阅结束，到多源历史中切换！！！", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // 单源链接，直接请求
+                        // 获取单源中的配置线路
+                        String result = MutiUrl(sourceJson);
+                        Toast.makeText(context, "单源链接，" + result, Toast.LENGTH_SHORT).show();
+                        String currentStoreName = Hawk.get(HawkConfig.STORE_API_NAME, "");
+                        if (!currentStoreName.isEmpty() && !storeNameHistory.contains(currentStoreName)) {
+                            storeNameHistory.add(0, currentStoreName);
                         }
                     }
-                    // 多仓历史上限，防止无限制增长
-                    while (storeNameHistory.size() > 30) storeNameHistory.remove(storeNameHistory.size() - 1);
-                    Toast.makeText(context, "多仓订阅结束，到多源历史中切换！！！", Toast.LENGTH_SHORT).show();
-                } else {
-                    // 单源链接，直接请求
-                    // 获取单源中的配置线路
-                    String result = MutiUrl(sourceJson);
-                    Toast.makeText(context, "单源链接，" + result, Toast.LENGTH_SHORT).show();
-                    String currentStoreName = Hawk.get(HawkConfig.STORE_API_NAME, "");
-                    if (!currentStoreName.isEmpty() && !storeNameHistory.contains(currentStoreName)) {
-                        storeNameHistory.add(0, currentStoreName);
-                    }
+                    Hawk.put(HawkConfig.STORE_API_MAP, storeMap);
+                    Hawk.put(HawkConfig.STORE_API_NAME_HISTORY, storeNameHistory);
+                } catch (Throwable e) {
+                    LOG.e("订阅数据解析异常：" + e);
+                    Toast.makeText(context, "订阅数据格式异常！", Toast.LENGTH_SHORT).show();
                 }
-                Hawk.put(HawkConfig.STORE_API_MAP, storeMap);
-                Hawk.put(HawkConfig.STORE_API_NAME_HISTORY, storeNameHistory);
             }
 
             @Override
@@ -152,44 +165,50 @@ public class StoreApiConfig {
     }
 
     private String MutiUrl(String urlsJson) {
+        // 1.0.14：该函数会被嵌套 doGet 回调再次调用（外层兜底覆盖不到），线路 JSON
+        // 缺 urls/name/url 字段或非法时不再抛异常，统一返回失败文案。
+        try {
+            // 合并既有持久化的历史，避免每次订阅都覆盖已有线路（原实现用全新局部变量导致历史被清空）
+            ArrayList<String> history = new ArrayList<>();
+            HashMap<String, String> map = new HashMap<>();
+            ArrayList<String> savedHistory = Hawk.get(HawkConfig.API_NAME_HISTORY, new ArrayList<>());
+            HashMap<String, String> savedMap = Hawk.get(HawkConfig.API_MAP, new HashMap<>());
+            if (savedHistory != null) history.addAll(savedHistory);
+            if (savedMap != null) map.putAll(savedMap);
 
-        // 合并既有持久化的历史，避免每次订阅都覆盖已有线路（原实现用全新局部变量导致历史被清空）
-        ArrayList<String> history = new ArrayList<>();
-        HashMap<String, String> map = new HashMap<>();
-        ArrayList<String> savedHistory = Hawk.get(HawkConfig.API_NAME_HISTORY, new ArrayList<>());
-        HashMap<String, String> savedMap = Hawk.get(HawkConfig.API_MAP, new HashMap<>());
-        if (savedHistory != null) history.addAll(savedHistory);
-        if (savedMap != null) map.putAll(savedMap);
+            String apiName = Hawk.get(HawkConfig.API_NAME, "");
+            String apiUrl = Hawk.get(HawkConfig.API_URL, "");
 
-        String apiName = Hawk.get(HawkConfig.API_NAME, "");
-        String apiUrl = Hawk.get(HawkConfig.API_URL, "");
-
-        if (!apiName.isEmpty() && !history.contains(apiName)) {
-            history.add(apiName);
-            map.put(apiName, apiUrl);
-        }
-
-        JsonObject urlsObject = new Gson().fromJson(urlsJson, JsonObject.class);
-
-        if (null == urlsObject.get("urls")) return "订阅出错，失败！！！";
-
-        JsonArray urlsObjects = urlsObject.get("urls").getAsJsonArray();
-
-
-        for (JsonElement element : urlsObjects) {
-            JsonObject obj = element.getAsJsonObject();
-            String name = obj.get("name").getAsString();
-            String url = obj.get("url").getAsString();
-            if (!map.containsValue(url)) {
-                history.add(name);
-                map.put(name, url);
+            if (!apiName.isEmpty() && !history.contains(apiName)) {
+                history.add(apiName);
+                map.put(apiName, apiUrl);
             }
+
+            JsonObject urlsObject = new Gson().fromJson(urlsJson, JsonObject.class);
+
+            if (null == urlsObject || null == urlsObject.get("urls")) return "订阅出错，失败！！！";
+
+            JsonArray urlsObjects = urlsObject.get("urls").getAsJsonArray();
+
+
+            for (JsonElement element : urlsObjects) {
+                JsonObject obj = element.getAsJsonObject();
+                String name = obj.get("name").getAsString();
+                String url = obj.get("url").getAsString();
+                if (!map.containsValue(url)) {
+                    history.add(name);
+                    map.put(name, url);
+                }
+            }
+            // 限制历史上限，防止无限制增长
+            while (history.size() > 30) history.remove(history.size() - 1);
+            Hawk.put(HawkConfig.API_NAME_HISTORY, history);
+            Hawk.put(HawkConfig.API_MAP, map);
+            return "订阅结束，共 " + history.size() + " 条线路";
+        } catch (Throwable e) {
+            LOG.e("线路订阅解析异常：" + e);
+            return "订阅出错，失败！！！";
         }
-        // 限制历史上限，防止无限制增长
-        while (history.size() > 30) history.remove(history.size() - 1);
-        Hawk.put(HawkConfig.API_NAME_HISTORY, history);
-        Hawk.put(HawkConfig.API_MAP, map);
-        return "订阅结束，共 " + history.size() + " 条线路";
     }
 
     public interface StoreApiConfigCallback {

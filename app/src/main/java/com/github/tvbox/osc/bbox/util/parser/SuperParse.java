@@ -14,9 +14,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SuperParse {
-    public static HashMap<String, ArrayList<String>> flagWebJx = new HashMap<>();
+    /** 1.0.14：改用并发容器。PlayActivity/PlayFragment 各自的单线程解析池可能并发 put，
+     *     原 HashMap 并发写存在丢数据风险（仅本类内部使用，改声明类型无外部影响）。 */
+    public static final Map<String, ArrayList<String>> flagWebJx = new ConcurrentHashMap<>();
     static HashMap<String, ArrayList<String>> configs = null;
     static LinkedHashMap<String, String> jsonJx = null;
     static ArrayList<String> webJx = null;
@@ -134,8 +137,16 @@ public class SuperParse {
     }
 
     public static JSONObject doJsonJx(String url){
-        LOG.i("echo-jsonJx2"+jsonJx.toString());
-        return JsonParallel.parse(jsonJx, url);
+        // 1.0.14：修复 jsonJx 为 null 时 Log 直接 NPE；并快照拷贝一份，
+        // 避免 JsonParallel 遍历期间被另一次 parse() 重写导致 ConcurrentModificationException/串配置。
+        // 注：jsonJx 本身仍为类级 static（彻底修复需贯穿调用链重构，见 docs/ROADMAP.md）。
+        LinkedHashMap<String, String> snapshot = jsonJx;
+        if (snapshot == null || snapshot.isEmpty()) {
+            LOG.i("echo-jsonJx2 未初始化，跳过");
+            return new JSONObject();
+        }
+        LOG.i("echo-jsonJx2 size=" + snapshot.size());
+        return JsonParallel.parse(new LinkedHashMap<>(snapshot), url);
     }
 
     public static void stopJsonJx(){

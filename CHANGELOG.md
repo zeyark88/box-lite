@@ -2,6 +2,38 @@
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。
 
+## [1.0.14] — 2026-11-03 P1 原生化全链路打通 + 解析热路径重构
+
+**打通 m3u8 原生过滤全链路**（深挖发现三处断点，导致原生路径此前从未真正生效）：
+- 修复 `M3u8.purify()` 调用 `M3u8Native.removeMinority` **参数顺序颠倒**（content/tsUrlPre 对调），此前即使放开开关也永远返回 null 回退 Java。
+- `app/build.gradle` 接入 `externalNativeBuild`（CMake 指向 `src/main/jni/CMakeLists.txt`）——此前 `libm3u8native.so` 根本没有编译进 APK，`System.loadLibrary` 恒失败。
+  **新增构建前置**：需 NDK + CMake（如 `sdkmanager "ndk;21.4.7075529" "cmake;3.10.2"`）。
+- `app/build.gradle` 显式 `buildToolsVersion "30.0.1"`（AGP 4.2.2 默认 30.0.3，但国内镜像普遍缺 30.0.3 包；30.0.1 与 compileSdk 30 完全兼容，保证镜像受限环境可复现构建）。
+- `quickjs/build.gradle` compileSdk 由 33 统一为 30（与 app/player 一致；该模块只用预编译 jniLibs，不引用 API 31+ 接口，免去 SDK 33 依赖）。
+- `CMakeLists.txt` 移除无效的 `set(ANDROID_ABI ...)` 死代码（ABI 实际由 Gradle 侧控制）。
+- `jni_m3u8.c` 输出缓冲由 64KB 固定栈改为按需 `malloc`（上界 = 原文长 + 行数×(前缀+2) + 4KB），大清单不再直接回退；分配失败安全回退 Java。
+- `M3u8Native.useNative()` 放开为 `true`：C 实现忠实复刻 + 样例单测通过 + 全失败路径自动回退 Java，最坏情况=回到纯 Java 行为。真机回归方法见类注释与 `docs/ROADMAP.md`。
+
+**`JsonParallel` 重构（解析热路径性能，P2 前置）**：
+- `OkHttpClient` / 线程池改为共享常驻单例（原每次 `parse` 新建 client + 5 线程池再销毁，连接与线程零复用，老盒子开销显著）。
+- `futures`/`calls` 局部化：消除并发调用间互相 clear/cancel 的竞态；拿到首个结果后按 `Call` 精确取消本批，不再 `cancelAll()` 误伤并发批次。
+- `completionService.take()` 无限等待改为 15s 整体超时：jx 全挂死不再永久阻塞解析线程。
+- `Response` 显式 `close`，取消/异常路径不再泄漏连接。
+- 修复 `getReqHeader`：`cat_ext` 为末位参数时 `end=-1` 导致 substring 越界异常 + `newUrl` 拼回整个 url。
+
+**`SuperParse` 加固**：
+- `doJsonJx(url)` 修复 `jsonJx` 为 null 时 `LOG` 直接 NPE；快照拷贝防遍历中被并发重写。
+- `flagWebJx` 改 `ConcurrentHashMap`（`PlayActivity`/`PlayFragment` 各自解析池并发 put 的丢数据风险）。
+- 注：`jsonJx` 静态竞态彻底修复需贯穿调用链重构，仍留在 P2（见 `docs/ROADMAP.md`）。
+
+**`StoreApiConfig` 崩溃修复**：
+- 订阅地址返回非 JSON（网关错误页/空内容）时，Gson 异常抛在 OkGo 回调线程直接崩溃 → `success`/`MutiUrl` 整体兜底，只提示不崩。
+- 当前线路名不在 `storeMap` 时 `get()` 返回 null 直接传给 OkGo → 回退默认仓库地址。
+
+**文档**：README 产物段对齐实际（包名 `tv.of.eu.box.daily`、版本指向 CHANGELOG）；ROADMAP P1 进展更新为"已打通、待真机回归"。
+
+产物 `release/box-v1.0.14.apk`（versionCode 15，仅 `armeabi-v7a`）。
+
 ## [1.0.13] — 2026-10-31 关于页加 GitHub 地址
 - "关于"对话框加入本发行版 GitHub：`https://github.com/zeyark88/box-lite`（保留上游出处）。
 - 已核验地址在 APK 编译布局内。

@@ -3,19 +3,37 @@ apply plugin: 'com.android.application'
 android {
     // 保持低版本：Android 4.1 (API 16) 起可用，目标是 4.4+ / 老盒子
     compileSdkVersion 30
+    // 构建工具固定 30.0.1（30 系）：AGP 4.2.2 默认要 30.0.3，但国内镜像普遍缺 30.0.3 包
+    // （腾讯/阿里/华为均已下架，仅 dl.google.com 有）。30.0.1 与 compileSdk 30 完全兼容，
+    // 显式指定可保证镜像受限环境也能复现构建。
+    buildToolsVersion "30.0.1"
 
     defaultConfig {
         // TODO(发行版): 修改为你的 applicationId / 名称 / 版本号，见 docs/DISTRIBUTION.md
         applicationId 'tv.of.eu.box.daily'
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 14
-        versionName '1.0.13'
+        versionCode 15
+        versionName '1.0.14'
         multiDexEnabled true
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
+        }
+        // P1：接入 m3u8 原生过滤模块（app/src/main/jni → libm3u8native.so）。
+        // ABI 与 player/quickjs 预编译 .so 保持一致（仅 armeabi-v7a）。
+        // 构建前置：需安装 NDK + CMake，如：sdkmanager "ndk;21.4.7075529" "cmake;3.10.2"
+        externalNativeBuild {
+            cmake {
+                abiFilters 'armeabi-v7a'
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "src/main/jni/CMakeLists.txt"
         }
     }
 
