@@ -175,15 +175,12 @@ public class App extends MultiDexApplication {
         proxyUrlHistory.add(url);
         proxyUrlHistory.add("https://ghproxy.net/");
         proxyUrlHistory.add("https://mirror.ghproxy.com/");
-        // 默认仓库地址
-        String defaultStoreApi = URL.DEFAULT_STORE_API_URL;
+        // 纯净版: 不内置默认仓库地址
+        String defaultStoreApi = "";
 
-        // 添加默认epg历史记录
+        // 纯净版: 不预置默认 EPG(节目单由用户自行配置)
         List<String> epgHistory = Hawk.get(HawkConfig.EPG_HISTORY, new ArrayList<>());
-        epgHistory.add("https://epg.112114.xyz?ch={name}&date={date}");
-        epgHistory.add("https://epg.51zmt.top:8001/?ch={name}&date={date}");
-        // 默认epg
-        String defaultEpgUrl = "https://epg.51zmt.top:8001?ch={name}&date={date}";
+        String defaultEpgUrl = "";
 
 
         // 不添加默认线路

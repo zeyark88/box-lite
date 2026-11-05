@@ -1,3 +1,13 @@
+# v1.0.16 (2026-11-05)
+
+**纯净版**：移除全部内置隐藏外联源地址
+
+- 清空 `DEFAULT_STORE_API_URL`（原内置 `gitea.com/404ynnub` 源仓库，启动自动拉源列表的根源）
+- 清空 `DEFAULT_API_URL`（原内置 `www.饭太硬.net` 默认线路）
+- 不再预置默认 EPG 节目单地址（`epg.51zmt.top` / `epg.112114.xyz`）
+- 源/直播/EPG/网盘全部由用户自行配置，**首次启动为全空白，零内置外联**
+- 保留（功能性、非隐藏源）：GitHub 下载代理选项历史（ghproxy 等，仅下拉选项）、源 jar 下载代理 `DOMAIN_NAME_PROXY`、DoH 域名解析选项列表（需手动开启才连接）、CrossWalk 运行时按需下载
+
 # v1.0.15 (2026-11-05)
 
 - **图标修复**：修复部分 TV launcher 应用图标显示黑块 —— icon 改为白底位图（drawable/app_icon），TV banner 改为位图 app_banner_b（原 banner 为透明 shape XML）
