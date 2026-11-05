@@ -222,6 +222,30 @@
             </LinearLayout>
 
             <LinearLayout
+                    android:id="@+id/play_cast"
+                    android:layout_width="@dimen/vs_60"
+                    android:layout_height="@dimen/vs_60"
+                    android:nextFocusUp="@id/play_cast"
+                    android:nextFocusDown="@id/parse_root"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/vs_6"
+                    android:layout_marginLeft="@dimen/vs_6"
+                    android:layout_marginEnd="@dimen/vs_6"
+                    android:layout_marginRight="@dimen/vs_6"
+                    android:background="@drawable/shape_btn_focus"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                <ImageView
+                        android:layout_width="@dimen/vs_50"
+                        android:layout_height="@dimen/vs_50"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:src="@drawable/ic_cast" />
+            </LinearLayout>
+
+            <LinearLayout
                     android:id="@+id/zimu_select"
                     android:layout_width="@dimen/vs_60"
                     android:layout_height="@dimen/vs_60"

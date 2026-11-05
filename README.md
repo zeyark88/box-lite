@@ -31,7 +31,8 @@ export ANDROID_HOME=$HOME/Android/Sdk
 
 - **最新 [v1.0.16](https://github.com/zeyark88/box-lite/releases/tag/v1.0.16)**：`box-v1.0.16.apk`（`tv.of.eu.box.daily`，versionCode 17，minSdk16/targetSdk26，仅 `armeabi-v7a`），发布说明与 SHA256 校验值见 [Releases](https://github.com/zeyark88/box-lite/releases)
 - v1.0.15：图标黑块修复 / 权限收敛(14→9) / DLNA 投屏 / 网盘 WebDAV / 移除应用管理 / 首页精简
-- v1.0.16：**纯净版**（移除全部内置源地址，首启零内置外联，源/直播/EPG 全部自行配置）
+- v1.0.16：**纯净版**（移除全部内置源地址，首启零内置外联）
+- v1.0.17~v1.0.21：**DLNA 投屏全链路**（发现引擎 MulticastLock+组播+单播+网段直扫、三端入口、控制面板、直链探测与防盗链诊断）；应用更名**星辰影音**
 - ⚠️ v1.0.14 起启用新正式签名（原密钥遗失），无法覆盖升级 1.0.13 及更早版本，需卸载后全新安装（详见该版 Release 说明）
 - 历史各版本修复明细见 [`CHANGELOG.md`](CHANGELOG.md)
 - keystore：`~/box-keys/box-release.jks`（**务必备份，丢失无法再发版**；路径与密码勿入库）

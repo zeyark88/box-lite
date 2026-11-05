@@ -233,6 +233,10 @@ public class VodController extends BaseController {
         mPlayLoadNetSpeed = findViewById(R.id.tv_play_load_net_speed);
         mVideoSize = findViewById(R.id.tv_videosize);
         mSubtitleView = findViewById(R.id.subtitle_view);
+        // 投屏按钮: 通知 PlayActivity 发起 DLNA 投屏
+        findViewById(R.id.play_cast).setOnClickListener(v -> {
+            try { org.greenrobot.eventbus.EventBus.getDefault().post(new com.github.tvbox.osc.bbox.event.CastEvent()); } catch (Exception ignore) {}
+        });
         mZimuBtn = findViewById(R.id.zimu_select);
         mAudioTrackBtn = findViewById(R.id.audio_track_select);
         mLandscapePortraitBtn = findViewById(R.id.landscape_portrait);
