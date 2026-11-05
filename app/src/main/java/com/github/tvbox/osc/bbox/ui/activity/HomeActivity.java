@@ -275,6 +275,11 @@ public class HomeActivity extends BaseActivity {
 
         tvSetting.clearFocus();
         tvSetting.setOnFocusChangeListener(focusChangeListener);
+        View tvDrive = findViewById(R.id.drive);
+        if (tvDrive != null) tvDrive.setOnClickListener(view -> {
+            FastClickCheckUtil.check(view, 500);
+            jumpActivity(DriveActivity.class);
+        });
         tvSetting.setOnClickListener(view -> {
             FastClickCheckUtil.check(view, 500);
             jumpActivity(SettingActivity.class);
@@ -287,17 +292,8 @@ public class HomeActivity extends BaseActivity {
         tvName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // dataInitOk = false;
-                // jarInitOk = true;
-                // showSiteSwitch();
-                if (dataInitOk && jarInitOk) {
-                    FastClickCheckUtil.check(v, 1000);
-                    Toast.makeText(mContext, "加载应用列表中...", Toast.LENGTH_SHORT).show();
-                    jumpActivity(AppsActivity.class);
-                } else {
-                    FastClickCheckUtil.check(v, 1000);
-                    jumpActivity(SettingActivity.class);
-                }
+                FastClickCheckUtil.check(v, 1000);
+                showSiteSwitch();
             }
         });
         tvName.setOnLongClickListener(new View.OnLongClickListener() {

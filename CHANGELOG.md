@@ -1,3 +1,13 @@
+# v1.0.15 (2026-11-05)
+
+- **图标修复**：修复部分 TV launcher 应用图标显示黑块 —— icon 改为白底位图（drawable/app_icon），TV banner 改为位图 app_banner_b（原 banner 为透明 shape XML）
+- **权限收敛**：14 → 9 项（移除定位/电话状态/安装包/GET_TASKS/挂载文件系统，tools:node remove）
+- **移除 AppsActivity**（应用管理）；首页应用名点击改为「切换站点」
+- **首页精简**：隐藏日期；顶部新增「网盘」入口（云图标）
+- **新增 DLNA 投屏**：详情页「投 屏」按钮，标准 UPnP 控制点（SSDP M-SEARCH 发现 + SOAP SetAVTransportURI/Play），零第三方库
+- **新增网盘**：WebDAV 浏览/播放（坚果云/Nextcloud/Alist/群晖），TV 大字焦点列表，账号配置持久化
+- **详情页**：下载/投屏等按钮间距统一
+
 # Changelog
 
 本项目为 `mlabalabala/box` 的自定义发行版。遵循语义化版本：`主.次.修订`。

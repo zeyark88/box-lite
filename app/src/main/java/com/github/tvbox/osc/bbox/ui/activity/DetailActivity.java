@@ -79,6 +79,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import com.github.tvbox.osc.bbox.util.dlna.DlnaController;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -117,6 +118,7 @@ public class DetailActivity extends BaseActivity {
     private TextView tvQuickSearch;
     private TextView tvCollect;
     private TextView tvDownload;
+    private TextView tvCast;
     private TvRecyclerView mGridViewFlag;
     private TvRecyclerView mGridView;
     private TvRecyclerView mSeriesGroupView;
@@ -182,6 +184,7 @@ public class DetailActivity extends BaseActivity {
         tvSeriesSort = findViewById(R.id.mSeriesSortTv);
         tvCollect = findViewById(R.id.tvCollect);
         tvDownload = findViewById(R.id.tvDownload);
+        tvCast = findViewById(R.id.tvCast);
         tvQuickSearch = findViewById(R.id.tvQuickSearch);
         mEmptyPlayList = findViewById(R.id.mEmptyPlaylist);
         mGridView = findViewById(R.id.mGridView);
@@ -312,6 +315,7 @@ public class DetailActivity extends BaseActivity {
             }
         });
         tvDownload.setVisibility(Hawk.get(HawkConfig.SHOW_PREVIEW, true) ? View.VISIBLE : View.GONE);
+        tvCast.setOnClickListener(v -> useDlnaCast());
         tvDownload.setOnClickListener(v -> {
             use1DMDownload();
         });
@@ -1107,6 +1111,36 @@ public class DetailActivity extends BaseActivity {
     private void setTvPlayUrl(String url)
     {
         setTextShow(tvPlayUrl, "播放地址：", url);
+    }
+
+    public void useDlnaCast() {
+        if (vodInfo != null && vodInfo.seriesMap != null && vodInfo.seriesMap.get(vodInfo.playFlag) != null
+                && vodInfo.seriesMap.get(vodInfo.playFlag).size() > 0) {
+            VodInfo.VodSeries vod = vodInfo.seriesMap.get(vodInfo.playFlag).get(vodInfo.playIndex);
+            String url = TextUtils.isEmpty(playFragment.getFinalUrl()) ? vod.url : playFragment.getFinalUrl();
+            if (url == null || url.isEmpty()) { Toast.makeText(DetailActivity.this, "暂无播放地址", Toast.LENGTH_SHORT).show(); return; }
+            DlnaController.scan(DetailActivity.this, 5000, new DlnaController.ScanCallback() {
+                @Override public void onFound(List<DlnaController.DlnaDevice> devices) {
+                    if (devices == null || devices.isEmpty()) {
+                        Toast.makeText(DetailActivity.this, "未发现投屏设备（请确认同一Wi-Fi）", Toast.LENGTH_SHORT).show(); return;
+                    }
+                    final String[] names = new String[devices.size()];
+                    for (int i = 0; i < devices.size(); i++) names[i] = devices.get(i).name;
+                    new AlertDialog.Builder(DetailActivity.this)
+                        .setTitle("选择投屏设备")
+                        .setItems(names, (d, w) -> DlnaController.castTo(devices.get(w), url,
+                            new DlnaController.CastCallback() {
+                                @Override public void onSuccess() { Toast.makeText(DetailActivity.this, "已投屏", Toast.LENGTH_SHORT).show(); }
+                                @Override public void onError(String msg) { Toast.makeText(DetailActivity.this, "投屏失败：" + msg, Toast.LENGTH_SHORT).show(); }
+                            }))
+                        .setNegativeButton("取消", null)
+                        .show();
+                }
+                @Override public void onError(String msg) { Toast.makeText(DetailActivity.this, "扫描失败：" + msg, Toast.LENGTH_SHORT).show(); }
+            });
+        } else {
+            Toast.makeText(DetailActivity.this, "资源异常，请稍后重试", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void use1DMDownload() {
