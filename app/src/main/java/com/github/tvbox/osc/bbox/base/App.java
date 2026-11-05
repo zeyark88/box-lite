@@ -44,6 +44,7 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        com.github.tvbox.osc.bbox.util.CrashHandler.install(this);
         instance = this;
         initParams();
         // OKGo
