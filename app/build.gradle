@@ -13,8 +13,8 @@ android {
         applicationId 'tv.of.eu.box.daily'
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 23
-        versionName '1.0.22'
+        versionCode 24
+        versionName '1.0.23'
         multiDexEnabled true
         javaCompileOptions {
             annotationProcessorOptions {

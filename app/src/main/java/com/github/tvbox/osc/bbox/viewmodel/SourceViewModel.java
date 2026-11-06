@@ -1006,12 +1006,39 @@ public class SourceViewModel extends ViewModel {
         }
     }
 
+    /**
+     * B-08：XStream 反序列化安全加固。
+     * 只允许本项目 bean 包与常用集合类型，阻断 ProcessBuilder 等 gadget 链；
+     * 同时保留 ignoreUnknownElements，兼容字段增减。
+     */
+    private static XStream newSafeXStream(Class<?> rootType) {
+        XStream xstream = new XStream(new DomDriver());
+        xstream.autodetectAnnotations(true);
+        xstream.processAnnotations(rootType);
+        xstream.ignoreUnknownElements();
+        try {
+            xstream.allowTypesByWildcard(new String[]{
+                    "com.github.tvbox.osc.bbox.bean.**",
+                    "java.util.**"
+            });
+        } catch (Throwable ignored) {
+            // 极老版本 XStream 无该 API 时退化为默认行为，不阻断主流程
+        }
+        return xstream;
+    }
+
+    /** 拒绝带 DTD / 外部实体声明的 XML，规避 XXE 文件读取与 SSRF。 */
+    private static boolean isDangerousXml(String xml) {
+        if (xml == null) return true;
+        String lower = xml.toLowerCase();
+        return lower.contains("<!doctype") || lower.contains("<!entity");
+    }
+
     private AbsSortXml sortXml(MutableLiveData<AbsSortXml> result, String xml) {
         try {
-            XStream xstream = new XStream(new DomDriver());//创建Xstram对象
-            xstream.autodetectAnnotations(true);
-            xstream.processAnnotations(AbsSortXml.class);
-            xstream.ignoreUnknownElements();
+            // B-08：拒绝带 DTD/外部实体的文档，规避 XXE
+            if (isDangerousXml(xml)) return null;
+            XStream xstream = newSafeXStream(AbsSortXml.class);
             AbsSortXml data = (AbsSortXml) xstream.fromXML(xml);
             for (MovieSort.SortData sort : data.classes.sortList) {
                 if (sort.filters == null) {
@@ -1261,10 +1288,9 @@ public class SourceViewModel extends ViewModel {
 
     private AbsXml xml(MutableLiveData<AbsXml> result, String xml, String sourceKey) {
         try {
-            XStream xstream = new XStream(new DomDriver());//创建Xstram对象
-            xstream.autodetectAnnotations(true);
-            xstream.processAnnotations(AbsXml.class);
-            xstream.ignoreUnknownElements();
+            // B-08：拒绝带 DTD/外部实体的文档，规避 XXE
+            if (isDangerousXml(xml)) return null;
+            XStream xstream = newSafeXStream(AbsXml.class);
             if (xml.contains("<year></year>")) {
                 xml = xml.replace("<year></year>", "<year>0</year>");
             }

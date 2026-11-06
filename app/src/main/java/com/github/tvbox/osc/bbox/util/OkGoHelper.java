@@ -330,6 +330,11 @@ public class OkGoHelper {
     }
 
     private static synchronized void setOkHttpSsl(OkHttpClient.Builder builder) {
+        // B-06：默认保持「全信任」以兼容大量使用自签名证书/HTTP 的第三方源，
+        // 避免一开严格校验就大批源不可用；用户可开启 SSL_STRICT_VERIFY 走系统默认校验。
+        if (Hawk.get(HawkConfig.SSL_STRICT_VERIFY, false)) {
+            return;
+        }
         try {
             // 自定义一个信任所有证书的TrustManager，添加SSLSocketFactory的时候要用到
             final X509TrustManager trustAllCert =

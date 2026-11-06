@@ -44,7 +44,18 @@ public class ControlManager {
     }
 
     public String getAddress(boolean local) {
-        return local ? mServer.getLoadAddress() : mServer.getServerAddress();
+        // 本地播放链路（127.0.0.1）无需令牌；对外展示的地址必须带令牌，避免局域网裸奔
+        return local ? mServer.getLoadAddress() : mServer.getServerAddressWithToken();
+    }
+
+    /**
+     * 带路径的地址（如 push.html），令牌以查询参数形式附加在路径之后。
+     */
+    public String getAddress(boolean local, String path) {
+        if (local) {
+            return mServer.getLoadAddress() + path;
+        }
+        return mServer.getServerAddress() + path + "?tk=" + RemoteServer.accessToken;
     }
 
     public void startServer() {

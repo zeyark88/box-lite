@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
@@ -25,6 +26,8 @@ import dalvik.system.DexClassLoader;
 import okhttp3.Response;
 
 public class JarLoader {
+    /** 爬虫 jar 体积上限（32MB），超出视为异常包。 */
+    private static final long MAX_JAR_BYTES = 32L * 1024 * 1024;
     private final ConcurrentHashMap<String, DexClassLoader> classLoaders = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Method> proxyMethods = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Spider> spiders = new ConcurrentHashMap<>();
@@ -141,13 +144,21 @@ public class JarLoader {
         }
         try {
             Response response = OkGo.<File>get(jar).execute();
-            assert response.body() != null;
+            if (response == null || response.body() == null) {
+                return null;
+            }
             InputStream is = response.body().byteStream();
             OutputStream os = new FileOutputStream(cache);
+            long total = 0;
             try {
-                byte[] buffer = new byte[2048];
+                byte[] buffer = new byte[4096];
                 int length;
                 while ((length = is.read(buffer)) > 0) {
+                    total += length;
+                    // B-07：限制单个爬虫包体积，避免恶意超大文件耗尽存储
+                    if (total > MAX_JAR_BYTES) {
+                        throw new IOException("jar exceeds size limit");
+                    }
                     os.write(buffer, 0, length);
                 }
             } finally {
@@ -158,10 +169,17 @@ public class JarLoader {
                     e.printStackTrace();
                 }
             }
+            // B-07：下载完成立即校验，不匹配则删除，绝不加载未校验的代码
+            if (!md5.isEmpty() && !MD5.getFileMd5(cache).equalsIgnoreCase(md5)) {
+                Log.e("JarLoader", "echo-jar md5 mismatch, discard");
+                cache.delete();
+                return null;
+            }
             loadClassLoader(cache.getAbsolutePath(), key);
             return classLoaders.get(key);
         } catch (Throwable e) {
             e.printStackTrace();
+            if (cache.exists()) cache.delete();
         }
         return null;
     }

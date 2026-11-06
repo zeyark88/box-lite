@@ -14,6 +14,8 @@ public class HawkConfig {
     public static final String HOME_API = "home_api";
     public static final String DEFAULT_PARSE = "parse_default";
     public static final String DEBUG_OPEN = "debug_open";
+    /** B-06：严格证书校验开关。默认关闭（兼容自签名源），开启后使用系统默认 TrustManager。 */
+    public static final String SSL_STRICT_VERIFY = "ssl_strict_verify";
     public static final String PARSE_WEBVIEW = "parse_webview"; // true 系统 false xwalk
     public static final String IJK_CODEC = "ijk_codec";
     public static final String PLAY_TYPE = "play_type";//0 系统 1 ijk 2 exo 10 MXPlayer

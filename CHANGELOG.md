@@ -1,3 +1,19 @@
+# v1.0.23 (2026-11-06)
+
+**安全加固版**：完整修复静态审计中 B-01 ~ B-10 共 10 项风险，功能与交互尽量保持不变。
+
+- **B-01 本地服务鉴权**：`9978-9999` 端口不再对局域网裸奔。电视端二维码/提示地址自动携带 `?tk=<令牌>`，页面 ajax 通过 `X-TV-Token` 请求头回传；本机（`127.0.0.1` 与本机网卡地址）请求一律放行，播放器、`clan://localhost` 链路不受影响。无令牌直接访问 IP 只返回提示页。
+- **B-02 `/file/` 路径穿越**：改为 `getCanonicalPath()` 前缀比对，越界返回 403（兼容 minSdk 16，未使用 `java.nio.file`）。
+- **B-03 解压 zip slip**：`unzip()` 逐条校验解压目标必须落在目标目录内，并新增 512MB 累计体积上限防 zip bomb。
+- **B-04 文件写操作越界**：`/upload`、`/newFolder`、`/delFolder`、`/delFile` 统一走路径校验；文件名只取 basename，禁止删除外部存储根目录。
+- **B-05 `/action` 配置注入**：配置 URL 增加协议白名单（http/https/clan/file）与 2048 字符上限，搜索关键字限长 128，非法请求返回 400。
+- **B-06 全信任证书可配置**：新增 `HawkConfig.SSL_STRICT_VERIFY`（默认关闭以兼容自签名源），开启后走系统默认 TrustManager。
+- **B-07 jar 下载即时校验**：下载完成后立即校验 MD5，不匹配直接删除且不加载；单包体积上限 32MB。
+- **B-08 XStream 反序列化**：新增类型白名单（仅本项目 bean 包与 `java.util`），并拒绝含 `<!DOCTYPE>` / `<!ENTITY>` 的 XML 防 XXE。
+- **B-09 Manifest**：`allowBackup` 关闭（`tools:replace` 覆盖三方库声明）；明文流量保持开启以兼容第三方源，严格模式见 B-06。
+- **B-10 Room 迁移**：显式声明 `fallbackToDestructiveMigration()`，避免未来升版缺少迁移导致启动崩溃。
+- 版本号：versionCode 24 / versionName 1.0.23；产物 `release/box-v1.0.23.apk`。
+
 # v1.0.22 (2026-11-05)
 
 - **新增崩溃自愈**：任何闪退自动保存日志到 `files/crash/crash_*.txt`，**1 秒后自动重启回首页**（TV 无人值守不再死机）

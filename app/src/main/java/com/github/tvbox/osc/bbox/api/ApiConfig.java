@@ -414,6 +414,14 @@ public class ApiConfig {
                     public void onSuccess(Response<File> response) {
                         File file = response.body();
                         if (file != null && file.exists()) {
+                            // B-07：下载完成立即校验 MD5，不匹配的包一律不加载
+                            if (md5 != null && !md5.isEmpty()
+                                    && !MD5.getFileMd5(file).equalsIgnoreCase(md5)) {
+                                LOG.e("echo---jar md5 mismatch, discard");
+                                file.delete();
+                                callback.error("MD5 校验失败");
+                                return;
+                            }
                             try {
                                 if (jarLoader.load(file.getAbsolutePath())) {
                                     LOG.i("echo---load-jar-success");

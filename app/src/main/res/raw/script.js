@@ -1,3 +1,32 @@
+/**
+ * 访问令牌（B-01 安全加固配套）：
+ * 电视端二维码地址形如 http://ip:port/?tk=XXXX，页面加载后自动携带 X-TV-Token 请求头。
+ * 直接输入 IP 访问（无令牌）时，服务端只返回提示页，不会下发令牌。
+ */
+var TVBOX_TK = (function () {
+    var m = window.location.search.match(/[?&]tk=([^&]+)/);
+    if (m && m[1]) return decodeURIComponent(m[1]);
+    if (window.__TVBOX_TK__) return window.__TVBOX_TK__;
+    try {
+        return sessionStorage.getItem('tvbox_tk') || '';
+    } catch (e) {
+        return '';
+    }
+})();
+
+if (TVBOX_TK) {
+    try {
+        sessionStorage.setItem('tvbox_tk', TVBOX_TK);
+    } catch (e) {
+        // 忽略隐私模式下的存储异常
+    }
+    $.ajaxSetup({
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader('X-TV-Token', TVBOX_TK);
+        }
+    });
+}
+
 function search() {
     doAction('search', { word: $('#search_key_word').val() });
 }

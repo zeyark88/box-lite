@@ -117,6 +117,8 @@ public class AppDataManager {
         if (dbInstance == null)
             dbInstance = Room.databaseBuilder(App.getInstance(), AppDataBase.class, dbPath())
                     .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
+                    // B-10：显式声明降级策略，避免未来版本号提升时因缺少迁移而崩溃
+                    .fallbackToDestructiveMigration()
                     //.addMigrations(MIGRATION_1_2)
                     //.addMigrations(MIGRATION_2_3)
                     //.addMigrations(MIGRATION_3_4)
