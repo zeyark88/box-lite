@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- 顶栏(状态栏)：左侧应用名，右侧 文件 / 设置 / 年月日时间 -->
     <LinearLayout
         android:id="@+id/topLayout"
         android:layout_width="match_parent"
@@ -24,9 +25,9 @@
             android:layout_width="wrap_content"
             android:layout_height="@dimen/vs_70"
             android:layout_weight="1"
-            android:focusable="false"
             android:layout_marginRight="@dimen/vs_15"
             android:layout_marginEnd="@dimen/vs_15"
+            android:focusable="false"
             android:focusableInTouchMode="false"
             android:gravity="left|center_vertical"
             android:text="@string/app_name"
@@ -36,41 +37,40 @@
             android:textStyle="bold" />
 
         <ImageView
-                android:id="@+id/drive"
-                android:layout_width="@dimen/vs_50"
-                android:layout_height="@dimen/vs_50"
-                android:padding="@dimen/vs_5"
-                android:focusable="true"
-                android:alpha="0.75"
-                android:background="@drawable/shape_btn_focus"
-                android:src="@drawable/icon_drive"
-                android:contentDescription="网  盘"/>
+            android:id="@+id/drive"
+            android:layout_width="@dimen/vs_50"
+            android:layout_height="@dimen/vs_50"
+            android:padding="@dimen/vs_5"
+            android:focusable="true"
+            android:alpha="0.75"
+            android:background="@drawable/shape_btn_focus"
+            android:src="@drawable/icon_drive"
+            android:contentDescription="文件" />
 
         <ImageView
-                android:id="@+id/setting"
-                android:layout_width="@dimen/vs_50"
-                android:layout_height="@dimen/vs_50"
-                android:padding="@dimen/vs_5"
-                android:focusable="true"
-                android:alpha="0.75"
-                android:background="@drawable/shape_btn_focus"
-                android:src="@drawable/icon_setting"
-                android:contentDescription="设  置"/>
+            android:id="@+id/setting"
+            android:layout_width="@dimen/vs_50"
+            android:layout_height="@dimen/vs_50"
+            android:padding="@dimen/vs_5"
+            android:focusable="true"
+            android:alpha="0.75"
+            android:background="@drawable/shape_btn_focus"
+            android:src="@drawable/icon_setting"
+            android:contentDescription="设置" />
 
         <TextView
             android:id="@+id/tvDate"
-            android:visibility="gone"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:focusable="false"
             android:layout_marginLeft="@dimen/vs_15"
             android:layout_marginStart="@dimen/vs_15"
+            android:focusable="false"
             android:focusableInTouchMode="false"
             android:gravity="right|center_vertical"
             android:textAlignment="gravity"
             android:textColor="@android:color/white"
-            android:textSize="@dimen/ts_30"
-            tools:text="DateTime" />
+            android:textSize="@dimen/ts_26"
+            tools:text="2026/11/08 00:11" />
 
     </LinearLayout>
 
