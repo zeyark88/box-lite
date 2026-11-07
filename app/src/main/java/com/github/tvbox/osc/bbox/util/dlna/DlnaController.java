@@ -20,7 +20,9 @@ import java.net.HttpURLConnection;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /** 轻量 DLNA 投屏控制点（标准 UPnP，无第三方库）。 */
 public class DlnaController {
@@ -28,6 +30,7 @@ public class DlnaController {
     private static final String SSDP_ADDR = "239.255.255.250";
     private static final int SSDP_PORT = 1900;
     private static final String AVT_URN = "urn:schemas-upnp-org:service:AVTransport:1";
+    private static String probeStatus = ""; // 最近一次投屏前探测状态(诊断用)
 
     public interface ScanCallback { void onFound(List<DlnaDevice> devices); void onError(String msg); }
     public interface CastCallback { void onSuccess(); void onError(String msg); }
@@ -155,34 +158,38 @@ public class DlnaController {
         } catch (Exception e) { return false; }
     }
 
+    /** 投屏(兼容旧调用): 不带请求头 */
     public static void castTo(DlnaDevice d, String videoUrl, CastCallback cb) {
+        castTo(d, videoUrl, null, cb);
+    }
+
+    /** 投屏: videoUrl 为源直链; headers 为播放器已带请求头(Referer/UA/Cookie 等, 可为 null) */
+    public static void castTo(DlnaDevice d, String videoUrl, HashMap<String, String> headers, CastCallback cb) {
         new Thread(() -> {
             try {
-                // 投屏前探测: 跟随重定向拿最终直链 + 防盗链/失效诊断
+                // 投屏前探测: 跟随重定向拿最终直链。探测仅用于诊断, 任何失败都不中止投屏,
+                // 降级用原始直链继续(防盗链/自签名https/超时等场景电视端仍可能自行拉到流)。
                 String finalUrl = videoUrl;
                 try {
                     HttpURLConnection pc = (HttpURLConnection) new URL(videoUrl).openConnection();
                     pc.setConnectTimeout(6000); pc.setReadTimeout(8000);
                     pc.setInstanceFollowRedirects(true);
-                    pc.setRequestProperty("User-Agent", "Mozilla/5.0");
+                    pc.setRequestProperty("User-Agent", headers != null && headers.get("User-Agent") != null ? headers.get("User-Agent") : "Mozilla/5.0");
                     pc.setRequestProperty("Range", "bytes=0-1");
+                    if (headers != null) {
+                        for (Map.Entry<String, String> e : headers.entrySet()) {
+                            String k = e.getKey(); String v = e.getValue();
+                            if (k != null && v != null && !"User-Agent".equalsIgnoreCase(k)) pc.setRequestProperty(k, v);
+                        }
+                    }
                     int code = pc.getResponseCode();
-                    if (code == 401 || code == 403) {
-                        pc.disconnect();
-                        post(() -> cb.onError("源直链拒绝裸拉(HTTP " + code + " 防盗链)：电视拉不到流。请换线路/换源，或用本机播放"));
-                        return;
-                    }
-                    if (code == 404 || code == 410) {
-                        pc.disconnect();
-                        post(() -> cb.onError("直链已失效(HTTP " + code + ")：请重新进入页面或换线路"));
-                        return;
-                    }
-                    finalUrl = pc.getURL().toString(); // 展平 302 后的最终直链
+                    probeStatus = "HTTP " + code;
+                    if (code >= 200 && code < 300) finalUrl = pc.getURL().toString(); // 展平 302 后的最终直链
                     try { pc.getInputStream().close(); } catch (Exception ignore) {}
                     pc.disconnect();
                 } catch (Exception probeErr) {
-                    post(() -> cb.onError("直链探测失败：" + probeErr.getMessage() + "（源不可达）"));
-                    return;
+                    // 探测异常(自签名证书/超时/源暂不可达等): 不中止, 直接按原直链投屏
+                    Log.w(TAG, "直链探测跳过(不影响投屏): " + probeErr.getMessage());
                 }
                 String ctrl = d.controlUrl;
                 if (!ctrl.startsWith("http")) ctrl = resolveUrl(d.location, ctrl);
@@ -199,7 +206,7 @@ public class DlnaController {
                 String r1 = soapPost(ctrl, "urn:schemas-upnp-org:service:AVTransport:1#SetAVTransportURI", body1);
                 String r2 = soapPost(ctrl, "urn:schemas-upnp-org:service:AVTransport:1#Play", body2);
                 boolean ok = (r1 != null) && (r2 != null);
-                if (ok) post(() -> cb.onSuccess()); else post(() -> cb.onError("投屏失败（设备无响应）"));
+                if (ok) post(() -> cb.onSuccess()); else post(() -> cb.onError("投屏失败（设备无响应）" + (probeStatus.isEmpty() ? "" : "；探测=" + probeStatus)));
             } catch (Exception e) {
                 Log.e(TAG, "cast err", e);
                 post(() -> cb.onError(e.getMessage()));

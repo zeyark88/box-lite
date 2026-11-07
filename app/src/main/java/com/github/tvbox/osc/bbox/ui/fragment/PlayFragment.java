@@ -87,9 +87,15 @@ public class PlayFragment extends BaseLazyFragment {
     private SourceViewModel sourceViewModel;
     private Handler mHandler;
     private String mFinalUrl;
+    private HashMap<String, String> mHeaders; // 当前播放请求头(投屏用, 可为 null)
 
     public String getFinalUrl(){
         return mFinalUrl;
+    }
+
+    /** 返回当前播放的请求头(投屏带 Referer/UA 等用, 可能为 null) */
+    public HashMap<String, String> getHeaders(){
+        return mHeaders;
     }
 
 
@@ -496,6 +502,8 @@ public class PlayFragment extends BaseLazyFragment {
     }
 
     void playUrl(String url, HashMap<String, String> headers) {
+        mFinalUrl = url;
+        mHeaders = headers;
         if(!url.startsWith("data:application"))EventBus.getDefault().post(new RefreshEvent(RefreshEvent.TYPE_REFRESH, url));//更新播放地址
         if (!Hawk.get(HawkConfig.M3U8_PURIFY, false)) {
             goPlayUrl(url,headers);

@@ -1116,6 +1116,7 @@ public class DetailActivity extends BaseActivity {
     }
 
     private DlnaController.DlnaDevice mCastDevice; // 当前投屏设备
+    private boolean mCastPaused; // 投屏端是否处于暂停(本地状态, 用于暂停/继续切换)
 
     public void useDlnaCast() { showCastPanel(); }
 
@@ -1134,19 +1135,12 @@ public class DetailActivity extends BaseActivity {
                 final DlnaController.DlnaDevice dev = mCastDevice;
                 if (dev == null) return;
                 if (w == 0) {
-                    DlnaController.getPosition(dev, new DlnaController.PosCallback() {
-                        @Override public void onResult(String rel, String dur) {
-                            String t = DlnaController.toSeconds(rel) > 0 ? "继续" : "暂停";
-                            DlnaController.CastCallback cb = new DlnaController.CastCallback() {
-                                @Override public void onSuccess() { }
-                                @Override public void onError(String msg) { }
-                            };
-                            if (t.equals("暂停")) DlnaController.pauseCast(dev, cb); else DlnaController.resumeCast(dev, cb);
-                        }
-                        @Override public void onError(String msg) {
-                            DlnaController.resumeCast(dev, new DlnaController.CastCallback() { @Override public void onSuccess() { } @Override public void onError(String m) { } });
-                        }
-                    });
+                    // 按本地状态切换暂停/继续(进度无法可靠区分播放/暂停)
+                    final DlnaController.CastCallback cb = new DlnaController.CastCallback() {
+                        @Override public void onSuccess() { mCastPaused = !mCastPaused; }
+                        @Override public void onError(String msg) { Toast.makeText(DetailActivity.this, (mCastPaused ? "继续" : "暂停") + "失败：" + msg, Toast.LENGTH_SHORT).show(); }
+                    };
+                    if (mCastPaused) DlnaController.resumeCast(dev, cb); else DlnaController.pauseCast(dev, cb);
                 } else if (w == 1 || w == 2) {
                     final int delta = (w == 1) ? 30 : -30;
                     DlnaController.getPosition(dev, new DlnaController.PosCallback() {
@@ -1191,9 +1185,9 @@ public class DetailActivity extends BaseActivity {
                     for (int i = 0; i < devices.size(); i++) names[i] = devices.get(i).name;
                     new AlertDialog.Builder(DetailActivity.this)
                         .setTitle("选择投屏设备")
-                        .setItems(names, (d, w) -> DlnaController.castTo(devices.get(w), url,
+                        .setItems(names, (d, w) -> DlnaController.castTo(devices.get(w), url, playFragment.getHeaders(),
                             new DlnaController.CastCallback() {
-                                @Override public void onSuccess() { mCastDevice = devices.get(w); Toast.makeText(DetailActivity.this, "已投屏到 " + mCastDevice.name, Toast.LENGTH_SHORT).show(); }
+                                @Override public void onSuccess() { mCastDevice = devices.get(w); mCastPaused = false; Toast.makeText(DetailActivity.this, "已投屏到 " + mCastDevice.name, Toast.LENGTH_SHORT).show(); }
                                 @Override public void onError(String msg) { Toast.makeText(DetailActivity.this, "投屏失败：" + msg, Toast.LENGTH_SHORT).show(); }
                             }))
                         .setNegativeButton("取消", null)
