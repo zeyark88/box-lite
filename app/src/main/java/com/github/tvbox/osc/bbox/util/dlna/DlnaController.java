@@ -362,12 +362,13 @@ public class DlnaController {
     }
 
     private static String extractTag(String xml, String tag) {
+        // 兼容大小写差异与命名空间前缀(如 <av:RelTime>), 兼容不标准设备
         try {
-            int a = xml.indexOf("<" + tag + ">");
-            if (a < 0) return null;
-            int b = xml.indexOf("</" + tag + ">", a);
-            if (b < 0) return null;
-            return xml.substring(a + tag.length() + 2, b);
+            java.util.regex.Pattern p = java.util.regex.Pattern.compile(
+                "<(?:[A-Za-z0-9_-]+:)?(" + java.util.regex.Pattern.quote(tag) + ")[^>]*>(.*?)</(?:[A-Za-z0-9_-]+:)?\\1\\s*>",
+                java.util.regex.Pattern.CASE_INSENSITIVE | java.util.regex.Pattern.DOTALL);
+            java.util.regex.Matcher m = p.matcher(xml);
+            return m.find() ? m.group(2).trim() : null;
         } catch (Exception e) { return null; }
     }
 
